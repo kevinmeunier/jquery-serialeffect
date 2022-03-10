@@ -14,7 +14,7 @@ jQuery serialeffect is highly performance-consuming if using on the whole page, 
 **Tested in:** IE, Edge, Chrome, Firefox, and Safari.
 
 
-#### Self-Hosted
+## Self-Hosted
 [Download](https://github.com/kevinmeunier/jquery.serialeffect/archive/master.zip) and save one of two available files to include Lazy to your page, either the [development](http://raw.githubusercontent.com/kevinmeunier/jquery.serialeffect/master/jquery.serialeffect.js) or the [minified](http://raw.githubusercontent.com/kevinmeunier/jquery.serialeffect/master/jquery.serialeffect.min.js) version.
 ```HTML
 <script type="text/javascript" src="jquery.serialeffect.min.js"></script>
