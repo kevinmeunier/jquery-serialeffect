@@ -31,6 +31,12 @@ $(document).ready(function(){
   $.serialeffect();
 });
 ```
+Make sure that your page is splitted by section (or any other selectors defined from 'sectionsSelector')
+```HTML
+<section>
+   // Your content here
+</section>
+```
 
 
 ## Configuration Parameters
