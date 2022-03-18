@@ -26,8 +26,9 @@ Make sure [jQuery](http://jquery.com) is properly loaded before using jQuery ser
 ## Basic Usage
 The basic usage of serialeffect is pretty easy, just start using jQuery serialeffect by calling it after page load. You don't have to specify your elements exactly, jQuery serialeffect will find them autonomously based on 'elementsTags' settings ('div, p, li, h1, img, span, a, g' by default).
 ```JS
-$(function($) {
-    $(".js-serialeffect").serialeffect();
+$(document).ready(function(){
+  // jquery.serialeffect initialisation
+  $.serialeffect();
 });
 ```
 
