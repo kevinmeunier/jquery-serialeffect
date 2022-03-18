@@ -22,10 +22,10 @@
 		let collections = [];
 		let elementsAnimated = [];
 		let performanceMode = 'advanced';
-	  let prevDelta = null;
-	  let prevPos = null;
-	  let timerScroll = null;
-	  let delta;
+		let prevDelta = null;
+		let prevPos = null;
+		let timerScroll = null;
+		let delta;
 		let initialized = false;
 
 		$.extend(this, {
