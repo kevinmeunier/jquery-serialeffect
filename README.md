@@ -39,7 +39,7 @@ Make sure that your page is splitted by section (or any other selectors defined 
 ```
 
 ## Advanced Usage
-In case you want to bind additional elements, you can do it by adding the element class and the element type. In the example below, the <img> will be identified autonomously by serialeffect, and the parent <div> will also be animated on scroll to create an parallax effect.
+In case you want to bind additional elements, you can do it by adding the element class and the element type. In the example below, the IMG will be identified autonomously by serialeffect, and the parent DIV will also be animated on scroll to create an parallax effect.
 ```HTML
 <div class="js-serialeffect is-visual"><img src="" alt=""></div>
 ```
