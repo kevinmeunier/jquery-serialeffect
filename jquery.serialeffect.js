@@ -7,60 +7,60 @@
  *
  * Released under the MIT license
  */
-(function($){
-	'use strict';
+  (function($){
+  'use strict';
 
-	const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+  const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 
-	$.serialeffect = function(options){
-		const settings = $.extend({}, $.serialeffect.defaults, options);
-		const root = this;
-		let windowHeight = document.documentElement.clientHeight;
-		let isWindowResized = false;
-		let latestKnownScrollY = window.scrollY;
-		let ticking = false;
-		let collections = [];
-		let elementsAnimated = [];
-		let performanceMode = 'advanced';
-		let prevDelta = null;
-		let prevPos = null;
-		let timerScroll = null;
-		let delta;
-		let initialized = false;
+  $.serialeffect = function(options){
+    const settings = $.extend({}, $.serialeffect.defaults, options);
+    const root = this;
+    let windowHeight = document.documentElement.clientHeight;
+    let isWindowResized = false;
+    let latestKnownScrollY = window.scrollY;
+    let ticking = false;
+    let collections = [];
+    let elementsAnimated = [];
+    let performanceMode = 'advanced';
+    let prevDelta = null;
+    let prevPos = null;
+    let timerScroll = null;
+    let delta;
+    let initialized = false;
 
-		$.extend(this, {
-			init: function(){
-				// Define the collections to animate
+    $.extend(this, {
+      init: function(){
+        // Define the collections to animate
         this.defineCollections();
 
-				// Deactivation of the effect for mobile (splitting words/letters is kept for onload animations)
-				if( isTouchDevice ){
-					root.setReady();
-					return;
-				}
+        // Deactivation of the effect for mobile (splitting words/letters is kept for onload animations)
+        if( isTouchDevice ){
+          root.setReady();
+          return;
+        }
 
-				// Identify always in viewport elements (fixed elements)
-				root.setAlwaysInViewport();
+        // Identify always in viewport elements (fixed elements)
+        root.setAlwaysInViewport();
 
-				// Apply data attributes
-				this.setCollectionsMax();
+        // Apply data attributes
+        this.setCollectionsMax();
 
-				// Store positions for performance optimization
-				root.setPositions();
+        // Store positions for performance optimization
+        root.setPositions();
 
-				// Bind resize event
-				window.addEventListener('resize', function(){
-					root.debounceEvent(root.eventResize);
-				});
+        // Bind resize event
+        window.addEventListener('resize', function(){
+          root.debounceEvent(root.eventResize);
+        });
 
-				// Bind scroll event by using rAF to optimize performance
-				window.addEventListener('scroll', function(){
-					latestKnownScrollY = window.scrollY;
-					root.debounceEvent(root.eventScroll);
-				});
+        // Bind scroll event by using rAF to optimize performance
+        window.addEventListener('scroll', function(){
+          latestKnownScrollY = window.scrollY;
+          root.debounceEvent(root.eventScroll);
+        });
 
-				//  Initialization completed
-				root.setReady();
+        //  Initialization completed
+        root.setReady();
       },
 
       defineCollections: function(){
