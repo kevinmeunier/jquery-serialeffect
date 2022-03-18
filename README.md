@@ -15,7 +15,7 @@ Tested in: IE, Edge, Chrome, Firefox, and Safari.
 
 
 ## Self-Hosted
-[Download](https://github.com/kevinmeunier/jquery-serialeffect/archive/master.zip) and save one of two available files to include serialeffect to your page, either the [development](https://github.com/kevinmeunier/jquery-serialeffect/blob/main/dist/jquery.serialeffect.js) or the [minified](https://github.com/kevinmeunier/jquery-serialeffect/blob/main/dist/jquery.serialeffect.min.js) version.
+[Download](https://github.com/kevinmeunier/jquery-serialeffect/archive/master.zip) and save one of two available files to include serialeffect to your page, either the [development](https://github.com/kevinmeunier/jquery-serialeffect/blob/main/dist/jquery.serialeffect.js) or the [minified](https://github.com/kevinmeunier/jquery-serialeffect/blob/main/dist/jquery.serialeffect.min.js) version. Also, you can visit the [project page](https://github.meunierkevin.com/jquery-serialeffect/) to copy/paste what you need.
 ```HTML
 <script type="text/javascript" src="jquery-serialeffect.min.js"></script>
 ```
