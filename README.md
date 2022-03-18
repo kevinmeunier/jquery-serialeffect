@@ -8,7 +8,7 @@ jQuery serialeffect is shared for inspirational and development purpose, it has 
 See the [project page](https://github.meunierkevin.com/jquery-serialeffect/) for a demonstration. The plugin can be also seen on [meunierkevin.com](https://www.meunierkevin.com).
 
 
-## Compatibility & Performance
+## Compatibility
 jQuery serialeffect is highly performance-consuming if used on the whole page. In order to maintain performance to an acceptable level, either limit the content on your page, or specify only a few elements. **Note that the animation effect is disabled on all mobile devices due to poor rendering management with the touch event.**
 
 Tested in: IE, Edge, Chrome, Firefox, and Safari.
