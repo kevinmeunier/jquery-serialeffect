@@ -1,7 +1,7 @@
 # jQuery serialeffect - An innovative way for animating letters on scroll
 
 ## About jQuery serialeffect
-jQuery serialeffect is shared for inspirational and development purpose, it has to be considered as a prototype as several bugs have been idenfitied but haven't been fixed yet. Also, many optimizations have been implemented to improve performance (debounce event, requestAnimationFrame, check FPS, etc.), however, a lag effect can appears depending on the CPU/GPU performance. When the FPS are too low, jQuery serialeffect will automatically switch to words animation instead of letters.
+jQuery serialeffect is shared for inspirational and development purpose, it has to be considered as a prototype due to several remaining bugs. Also, many optimizations have been implemented to improve performance (debounce event, requestAnimationFrame, check FPS, etc.), however, a lag effect can appears depending on the CPU/GPU performance. When the FPS are too low, jQuery serialeffect will automatically switch to words animation instead of letters.
 
 
 ## Example
