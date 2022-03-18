@@ -1,26 +1,26 @@
-### jquery.serialeffect - An innovative plugin based on jQuery to animate letters on scroll.
+# jquery.serialeffect - An innovative plugin based on jQuery to animate letters on scroll.
 
 ## About jQuery serialeffect
-jQuery serialeffect has been published on GitHub for educational purpose, it has to be considered as a prototype. Although many optimizations have been developed to improve performance (debounce event, requestAnimationFrame, check FPS, etc.), a lagging effect can appears depending the CPU/GPU. When the FPS are too low, jQuery serialeffect will automatically switch to words animation instead of letters.
+jQuery serialeffect is shared for inspirational and development purpose, it has to be considered as a prototype as several bugs have been idenfitied but haven't been fixed yet. Also, many optimizations have been implemented to improve performance (debounce event, requestAnimationFrame, check FPS, etc.), however, a lag effect can appears depending on the CPU/GPU performance. When the FPS are too low, jQuery serialeffect will automatically switch to words animation instead of letters.
 
 
 ## Example
-For [documentation](http://jquery.eisbehr.de/lazy/#parameter), [examples](http://jquery.eisbehr.de/lazy/#examples) and other information take a look on the [project page](http://jquery.eisbehr.de/lazy/).
+See the [project page](https://github.meunierkevin.com/jquery-serialeffect/) for a demonstration.
 
 
 ## Compatibility & Performance
-jQuery serialeffect is highly performance-consuming if using on the whole page, in order to maintain decent performance, either limit the content on your page, or specify manually a few elements. **The animation effect is disabled on all mobile devices due to poor rendering management with the touch event.**
+jQuery serialeffect is highly performance-consuming if used on the whole page. In order to maintain performance to an acceptable level, either limit the content on your page, or specify only a few elements. **Note that the animation effect is disabled on all mobile devices due to poor rendering management with the touch event.**
 
-**Tested in:** IE, Edge, Chrome, Firefox, and Safari.
+Tested in: IE, Edge, Chrome, Firefox, and Safari.
 
 
 ## Self-Hosted
-[Download](https://github.com/kevinmeunier/jquery.serialeffect/archive/master.zip) and save one of two available files to include Lazy to your page, either the [development](http://raw.githubusercontent.com/kevinmeunier/jquery.serialeffect/master/jquery.serialeffect.js) or the [minified](http://raw.githubusercontent.com/kevinmeunier/jquery.serialeffect/master/jquery.serialeffect.min.js) version.
+[Download](https://github.com/kevinmeunier/jquery-serialeffect/archive/master.zip) and save one of two available files to include serialeffect to your page, either the [development](http://raw.githubusercontent.com/kevinmeunier/jquery-serialeffect/master/jquery-serialeffect.js) or the [minified](http://raw.githubusercontent.com/kevinmeunier/jquery-serialeffect/master/jquery-serialeffect.min.js) version.
 ```HTML
-<script type="text/javascript" src="jquery.serialeffect.min.js"></script>
+<script type="text/javascript" src="jquery-serialeffect.min.js"></script>
 ```
 
-Make sure [jQuery](http://jquery.com) is properly loaded before calling jQuery serialeffect. 
+Make sure [jQuery](http://jquery.com) is properly loaded before using jQuery serialeffect. 
 
 
 ## Basic Usage
@@ -31,9 +31,6 @@ $(function($) {
 });
 ```
 
-
-## Advanced Usage
-To do
 
 ## Configuration Parameters
 The following configurations is available by default:
@@ -50,7 +47,7 @@ callback           | *boolean*  | *false*                             | Function
 
 
 ## Bugs / Feature request
-Please [report](http://github.com/kevinmeunier/jquery.serialeffect/issues) bugs and feel free to [ask](http://github.com/kevinmeunier/jquery.serialeffect/issues) for new features directly on GitHub.
+Please [report](http://github.com/kevinmeunier/jquery-serialeffect/issues) bugs and feel free to [ask](http://github.com/kevinmeunier/jquery-serialeffect/issues) for new features directly on GitHub.
 
 
 ## License
