@@ -31,14 +31,25 @@ $(document).ready(function(){
   $.serialeffect();
 });
 ```
-Make sure that your page is splitted by section (or any other selectors defined from 'sectionsSelector')
+Make sure that your page is splitted by section (or any other selectors defined from 'sectionsSelector'). Dividing by sections is needed to improve performance.
 ```HTML
 <section>
    // Your content here
 </section>
 ```
 
+## Advanced Usage
+In case you want to bind additional elements, you can do it by adding the element class and the element type. In the example below, the <img> will be identified autonomously by serialeffect, and the parent <div> will also be animated on scroll to create an parallax effect.
+```HTML
+<div class="js-serialeffect is-visual"><img src="" alt=""></div>
+```
 
+Additionally, the 'maxGap' (see the parameters below can be set per element to increase or decrease the gap effect.
+```HTML
+<div class="js-serialeffect is-visual" data-serialeffect-max="50"><img src="" alt=""></div>
+```
+  
+  
 ## Configuration Parameters
 The following configurations is available by default:
 
