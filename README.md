@@ -4,8 +4,8 @@
 jQuery serialeffect is shared for inspirational and development purpose, it has to be considered as a prototype due to several remaining bugs. Also, many optimizations have been implemented to improve performance (debounce event, requestAnimationFrame, check FPS, etc.), however, a lag effect can appears depending on the CPU/GPU performance. When the FPS are too low, jQuery serialeffect will automatically switch to words animation instead of letters.
 
 
-## Example
-See the [project page](https://github.meunierkevin.com/jquery-serialeffect/) for a demonstration.
+## Demostration
+See the [project page](https://github.meunierkevin.com/jquery-serialeffect/) for a demonstration. The plugin can be also seen on [meunierkevin.com](https://www.meunierkevin.com).
 
 
 ## Compatibility & Performance
