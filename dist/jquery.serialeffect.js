@@ -1,403 +1,403 @@
 /*!
  * jQuery serialeffect
- * https://github.com/kevinmeunier/jquery-serialeffect
  *
- * Copyright 2022 Meunier Kévin
- * https://www.meunierkevin.com
- *
+ * Copyright 2022 Meunier Kévin (https://www.meunierkevin.com)
  * Released under the MIT license
  */
-  (function($){
-  'use strict';
+(function($){
+	'use strict';
 
-  const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+	const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 
-  $.serialeffect = function(options){
-    const settings = $.extend({}, $.serialeffect.defaults, options);
-    const root = this;
-    let windowHeight = document.documentElement.clientHeight;
-    let isWindowResized = false;
-    let latestKnownScrollY = window.scrollY;
-    let ticking = false;
-    let collections = [];
-    let elementsAnimated = [];
-    let performanceMode = 'advanced';
-    let prevDelta = null;
-    let prevPos = null;
-    let timerScroll = null;
-    let delta;
-    let initialized = false;
+	$.serialeffect = function(options){
+		const settings = $.extend({}, $.serialeffect.defaults, options);
+		const root = this;
+		let windowHeight = document.documentElement.clientHeight;
+		let isWindowResized = false;
+		let latestKnownScrollY = window.scrollY;
+		let ticking = false;
+		let collections = [];
+		let elementsAnimated = [];
+		let performanceMode = 'advanced';
+	  let prevDelta = null;
+	  let prevPos = null;
+	  let timerScroll = null;
+	  let delta;
+		let initialized = false;
 
-    $.extend(this, {
-      init: function(){
-        // Define the collections to animate
+		$.extend(this, {
+			init: function(){
+				// Define the collections to animate
         this.defineCollections();
 
-        // Deactivation of the effect for mobile (splitting words/letters is kept for onload animations)
-        if( isTouchDevice ){
-          root.setReady();
-          return;
-        }
+				// Deactivation of the effect for mobile (splitting words/letters is kept for onload animations)
+				if( isTouchDevice ){
+					root.setReady();
+					return;
+				}
 
-        // Identify always in viewport elements (fixed elements)
-        root.setAlwaysInViewport();
+				// Identify always in viewport elements (fixed elements)
+				root.setAlwaysInViewport();
 
-        // Apply data attributes
-        this.setCollectionsMax();
+				// Apply data attributes
+				this.setCollectionsMax();
 
-        // Store positions for performance optimization
-        root.setPositions();
+				// Store positions for performance optimization
+				root.setPositions();
 
-        // Bind resize event
-        window.addEventListener('resize', function(){
-          root.debounceEvent(root.eventResize);
-        });
+				// Bind resize event
+				window.addEventListener('resize', function(){
+					root.debounceEvent(root.eventResize);
+				});
 
-        // Bind scroll event by using rAF to optimize performance
-        window.addEventListener('scroll', function(){
-          latestKnownScrollY = window.scrollY;
-          root.debounceEvent(root.eventScroll);
-        });
+				// Bind scroll event by using rAF to optimize performance
+				window.addEventListener('scroll', function(){
+					latestKnownScrollY = window.scrollY;
+					root.debounceEvent(root.eventScroll);
+				});
 
-        //  Initialization completed
-        root.setReady();
+				//  Initialization completed
+				root.setReady();
       },
 
       defineCollections: function(){
-        // Split collections by section (performance optimisation)
-        $(settings.sectionsSelector).each(function(index){
-          // Initialisation of the collections (split by sections)
-          collections.push({ section: this, elements: [] });
-          const collection = collections[index];
+				// Split collections by section (performance optimisation)
+				$(settings.sectionsSelector).each(function(index){
+					// Initialisation of the collections (split by sections)
+					collections.push({ section: this, elements: [] });
+					const collection = collections[index];
 
-          // Search for elligible elements
-          $(this).find(settings.elementsSelector).each(function(){
-            // Element to be ignored
-            if( this.classList.contains(settings.ignoreClass) || $(this).parents('.'+settings.ignoreClass).length )
-              return;
+					// Search for elligible elements
+	        $(this).find(settings.elementsSelector).each(function(){
+						// Element to be ignored
+						if( this.classList.contains(settings.ignoreClass) || $(this).parents('.'+settings.ignoreClass).length )
+							return;
 
-            // Pre-existing words
-            if( this.classList.contains('is-word') ){
-              collection.elements.push({ word: this, letters: Array.from(this.getElementsByClassName('is-letter')) });
+						// Pre-existing words
+						if( this.classList.contains('is-word') ){
+							collection.elements.push({ word: this, letters: Array.from(this.getElementsByClassName('is-letter')) });
 
-            } else if( this.classList.contains('is-letter') ){
-              return; // Letters are already took in account above
+						} else if( this.classList.contains('is-letter') ){
+							return; // Letters are already took in account above
 
-            // Pre-existing visuals
-            } else if( this.classList.contains('is-visual') ){
-              collection.elements.push({ visual: this });
+						// Pre-existing visuals
+						} else if( this.classList.contains('is-visual') ){
+							collection.elements.push({ visual: this });
 
-            // Visual (including SVG)
-            } else if( this.tagName == 'IMG' || this.tagName == 'g' ){
-              this.classList.add(settings.elementsClass);
-              this.classList.add('is-visual');
-              collection.elements.push({ visual: this });
+						// Visual (including SVG)
+						} else if( this.tagName == 'IMG' || this.tagName == 'g' ){
+							this.classList.add(settings.elementsClass);
+							this.classList.add('is-visual');
+							collection.elements.push({ visual: this });
 
-            // Text
-            } else if( this.firstChild != null && this.firstChild.textContent.trim().length > 0 && this.firstChild.nodeType == 3 ){
-              const words = root.getWords(this);
+						// Text
+						} else if( this.firstChild != null && this.firstChild.textContent.trim().length > 0 && this.firstChild.nodeType == 3 ){
+							const words = root.getWords(this);
 
-              for( let word of words ){
-                // Wrap each letter with a serialeffect class
-                word.innerHTML = word.innerHTML.replace(/\S/g, '<span class="'+ settings.elementsClass +' is-letter">$&</span>');
+							for( let word of words ){
+								// Wrap each letter with a serialeffect class
+								word.innerHTML = word.innerHTML.replace(/\S/g, '<span class="'+ settings.elementsClass +' is-letter" aria-hidden="true">$&</span>');
 
-                // Push to collections
-                collection.elements.push({ word: word, letters: Array.from(word.getElementsByClassName(settings.elementsClass)) });
-              }
-            }
-          });
-        });
+								// Push to collections
+								collection.elements.push({ word: word, letters: Array.from(word.getElementsByClassName(settings.elementsClass)) });
+							}
+
+              // Accessibility
+              this.ariaLabel = this.textContent;
+						}
+	        });
+				});
       },
 
-      getWords: function(element){
-        let words = element.innerHTML.split(' ');
-        let html = [];
+			getWords: function(element){
+				let words = element.innerHTML.split(' ');
+				let html = [];
 
-        // Splitting by words
-        for( const word in words ){
-          if( words[word].indexOf('-') != -1 || words[word].indexOf(',') != -1 || words[word].indexOf('.') != -1 ){
-            html.push('<span class="js-serialeffect-compounded">'+ words[word].replace(/[A-zÀ-ú]+|[-,.]/g, '<span class="'+ settings.elementsClass +' is-word">$&</span>') +'</span>');
-          } else {
-            html.push('<span class="'+ settings.elementsClass +' is-word">'+ words[word] +'</span>');
-          }
-        }
+				// Splitting by words
+				for( const word in words ){
+				  if( words[word].indexOf('-') != -1 || words[word].indexOf(',') != -1 || words[word].indexOf('.') != -1 ){
+				    html.push('<span class="js-serialeffect-compounded" aria-hidden="true">'+ words[word].replace(/[A-zÀ-ú]+|[-,.]/g, '<span class="'+ settings.elementsClass +' is-word" aria-hidden="true">$&</span>') +'</span>');
+				  } else {
+				    html.push('<span class="'+ settings.elementsClass +' is-word" aria-label="'+ words[word] +'">'+ words[word] +'</span>');
+				  }
+				}
 
-        // Generate the final HTML
-        element.innerHTML = html.join(' ');
+				// Generate the final HTML
+				element.innerHTML = html.join(' ');
 
-        return Array.from(element.getElementsByClassName(settings.elementsClass));
+				return Array.from(element.getElementsByClassName(settings.elementsClass));
       },
 
-      setAlwaysInViewport: function(){
-        function isAlwaysInViewport(element){
-          const $element = $(element);
-          const $collection = $element.add($element.parents());
-          let ret = false;
+			setAlwaysInViewport: function(){
+				function isAlwaysInViewport(element){
+					const $element = $(element);
+			    const $collection = $element.add($element.parents());
+			    let ret = false;
 
-          $collection.each(function(){
-            if( $(this).css('position') === 'fixed' ){
-              ret = true;
-              return false;
-            }
-          });
-          return ret;
-        }
+			    $collection.each(function(){
+		        if( $(this).css('position') === 'fixed' ){
+	            ret = true;
+	            return false;
+		        }
+			    });
+			    return ret;
+				}
 
-        // Browse all elements
-        root.eachCollectionElement({
-          callback: function(element){
-            element['serialeffect-alwaysinviewport'] = isAlwaysInViewport(element);
-          },
-          callbackSections: true,
-          callbackWords: true,
-          callbackVisuals: true,
-          callbackLetters: true,
-          onlyViewport: false
-        });
+				// Browse all elements
+				root.eachCollectionElement({
+					callback: function(element){
+						element['serialeffect-alwaysinviewport'] = isAlwaysInViewport(element);
+					},
+					callbackSections: true,
+					callbackWords: true,
+					callbackVisuals: true,
+					callbackLetters: true,
+					onlyViewport: false
+				});
+			},
+
+			setCollectionsMax: function(){
+				// Browse each element in the viewport
+				root.eachCollectionElement({
+					callback: function(element){
+						const maxGap = element.dataset.serialeffectMax || settings.maxGap;
+
+						// Appy in the element's max gap
+						element['serialeffect-max'] = ( Math.random() * (maxGap - 1) + 1 ).toFixed();
+					},
+					callbackSections: false,
+					callbackWords: performanceMode == 'standard',
+					callbackVisuals: true,
+					callbackLetters: performanceMode == 'advanced',
+					onlyViewport: true
+				});
       },
 
-      setCollectionsMax: function(){
-        // Browse each element in the viewport
-        root.eachCollectionElement({
-          callback: function(element){
-            const maxGap = element.dataset.serialeffectMax || settings.maxGap;
+			eachCollectionElement: function(parameters){
+				for( let collection of collections ){
+					// Ignore sections outside the viewport
+					if( initialized == true && ( parameters.onlyViewport == true && root.isInViewport(collection.section) == false ) )
+						continue;
 
-            // Appy in the element's max gap
-            element['serialeffect-max'] = ( Math.random() * (maxGap - 1) + 1 ).toFixed();
-          },
-          callbackSections: false,
-          callbackWords: performanceMode == 'standard',
-          callbackVisuals: true,
-          callbackLetters: performanceMode == 'advanced',
-          onlyViewport: true
-        });
-      },
+					// Trigger the callback function for sections
+					if( parameters.callbackSections == true )
+						parameters.callback(collection.section);
 
-      eachCollectionElement: function(parameters){
-        for( let collection of collections ){
-          // Ignore sections outside the viewport
-          if( initialized == true && ( parameters.onlyViewport == true && root.isInViewport(collection.section) == false ) )
-            continue;
+					// Browse elements in the section
+					for( let elements of collection.elements ){
+						const element = elements.word || elements.visual;
 
-          // Trigger the callback function for sections
-          if( parameters.callbackSections == true )
-            parameters.callback(collection.section);
+						// Ignore elements outside the viewport
+						if( initialized == true && ( parameters.onlyViewport == true && root.isInViewport(element) == false ) )
+							continue;
 
-          // Browse elements in the section
-          for( let elements of collection.elements ){
-            const element = elements.word || elements.visual;
+						// Trigger the callback function for words
+						if( parameters.callbackWords == true && elements.word )
+							parameters.callback(elements.word);
 
-            // Ignore elements outside the viewport
-            if( initialized == true && ( parameters.onlyViewport == true && root.isInViewport(element) == false ) )
-              continue;
+						// Trigger the callback function for visuals
+						if( parameters.callbackVisuals == true && elements.visual )
+							parameters.callback(elements.visual);
 
-            // Trigger the callback function for words
-            if( parameters.callbackWords == true && elements.word )
-              parameters.callback(elements.word);
+						if( parameters.callbackLetters == true && elements.letters ){
+							for( let letter of elements.letters ){
+								// No check in the viewport is needed for letters as it's already previously done by words
+								parameters.callback(letter);
+							}
+						}
+					}
+				}
+			},
 
-            // Trigger the callback function for visuals
-            if( parameters.callbackVisuals == true && elements.visual )
-              parameters.callback(elements.visual);
+			setPositions: function(){
+				// Update the windowHeight only when changing
+				windowHeight = document.documentElement.clientHeight;
 
-            if( parameters.callbackLetters == true && elements.letters ){
-              for( let letter of elements.letters ){
-                // No check in the viewport is needed for letters as it's already previously done by words
-                parameters.callback(letter);
-              }
-            }
-          }
-        }
-      },
+				// Browse each element in the viewport
+				root.eachCollectionElement({
+					callback: function(element){
+						// Update data used for viewport detection
+						element['serialeffect-offetTop'] = $(element).offset().top;
+						element['serialeffect-offsetBottom'] = element['serialeffect-offetTop'] + element.clientHeight;
+					},
+					callbackSections: true,
+					callbackWords: true,
+					callbackVisuals: true,
+					callbackLetters: false,
+					onlyViewport: false
+				});
+			},
 
-      setPositions: function(){
-        // Update the windowHeight only when changing
-        windowHeight = document.documentElement.clientHeight;
+			debounceEvent: function(callback){
+				if( !ticking ){
+					requestAnimationFrame(function(){
+						callback();
+						ticking = false;
+					});
+				}
+				ticking = true;
+			},
 
-        // Browse each element in the viewport
-        root.eachCollectionElement({
-          callback: function(element){
-            // Update data used for viewport detection
-            element['serialeffect-offetTop'] = $(element).offset().top;
-            element['serialeffect-offsetBottom'] = element['serialeffect-offetTop'] + element.clientHeight;
-          },
-          callbackSections: true,
-          callbackWords: true,
-          callbackVisuals: true,
-          callbackLetters: false,
-          onlyViewport: false
-        });
-      },
+			eventResize: function(){
+				// Update status
+				isWindowResized = true;
+			},
 
-      debounceEvent: function(callback){
-        if( !ticking ){
-          requestAnimationFrame(function(){
-            callback();
-            ticking = false;
-          });
-        }
-        ticking = true;
-      },
+			eventScroll: function(){
+				// Check performance
+				if( performanceMode == 'advanced' )
+					root.checkPerformance();
 
-      eventResize: function(){
-        // Update status
-        isWindowResized = true;
-      },
+				// Update positions if needed
+				if( isWindowResized == true ){
+					root.setPositions();
+					isWindowResized = false;
+				}
 
-      eventScroll: function(){
-        // Check performance
-        if( performanceMode == 'advanced' )
-          root.checkPerformance();
+				// Avoid returning 0 for the very first value
+				if( prevPos == null ){
+					prevPos = latestKnownScrollY;
+					return;
+				}
 
-        // Update positions if needed
-        if( isWindowResized == true ){
-          root.setPositions();
-          isWindowResized = false;
-        }
+				// Get the delta
+				delta = latestKnownScrollY - prevPos;
+				prevPos = latestKnownScrollY;
 
-        // Avoid returning 0 for the very first value
-        if( prevPos == null ){
-          prevPos = latestKnownScrollY;
-          return;
-        }
+				// Avoid duplicate values
+				if( delta == prevDelta )
+					return;
 
-        // Get the delta
-        delta = latestKnownScrollY - prevPos;
-        prevPos = latestKnownScrollY;
+				prevDelta = delta;
 
-        // Avoid duplicate values
-        if( delta == prevDelta )
-          return;
+				// Clear the time on scroll
+				if( timerScroll != null )
+					clearTimeout(timerScroll);
 
-        prevDelta = delta;
+				// Reset the values when scroll is done
+				timerScroll = setTimeout(function(){
+					prevPos = null;
+					prevDelta = null;
 
-        // Clear the time on scroll
-        if( timerScroll != null )
-          clearTimeout(timerScroll);
+					// Reset y position to 0
+					root.animateAfter();
 
-        // Reset the values when scroll is done
-        timerScroll = setTimeout(function(){
-          prevPos = null;
-          prevDelta = null;
+					// Make sure the callback is triggered one last time
+					if( settings.callback && typeof settings.callback === 'function' )
+						settings.callback(speed);
+				}, 50);
 
-          // Reset y position to 0
-          root.animateAfter();
+				// 200 is considered as the maximum distance/speed that can be done
+				if( delta > 200 ) delta = 200;
+				if( delta < -200 ) delta = -200;
 
-          // Make sure the callback is triggered one last time
-          if( settings.callback && typeof settings.callback === 'function' )
-            settings.callback(speed);
-        }, 50);
+				// Convert the gap from -200 to 200 to a value from -1 to 1
+				const speed = ( delta / 200 * 100).toFixed() / 100;
 
-        // 200 is considered as the maximum distance/speed that can be done
-        if( delta > 200 ) delta = 200;
-        if( delta < -200 ) delta = -200;
+				// External callback to use speed outside the plugin
+				if( settings.callback && typeof settings.callback === 'function' )
+					settings.callback(speed);
 
-        // Convert the gap from -200 to 200 to a value from -1 to 1
-        const speed = ( delta / 200 * 100).toFixed() / 100;
+				// Animate
+				root.animate(speed);
+			},
 
-        // External callback to use speed outside the plugin
-        if( settings.callback && typeof settings.callback === 'function' )
-          settings.callback(speed);
+			animate: function(speed){
+				// Search for every element in the viewport to be updated
+				root.eachCollectionElement({
+					callback: function(element){
+						// Apply styles
+						element.style.transform = 'translateY('+ speed * element['serialeffect-max'] +'px)';
 
-        // Animate
-        root.animate(speed);
-      },
+						// Add to the animated elements
+						elementsAnimated.push(element);
+					},
+					callbackSections: false,
+					callbackWords: performanceMode == 'standard',
+					callbackVisuals: true,
+					callbackLetters: performanceMode == 'advanced',
+					onlyViewport: true
+				});
+			},
 
-      animate: function(speed){
-        // Search for every element in the viewport to be updated
-        root.eachCollectionElement({
-          callback: function(element){
-            // Apply styles
-            element.style.transform = 'translateY('+ speed * element['serialeffect-max'] +'px)';
+			animateAfter: function(){
+				// Reset the maximum value
+				root.setCollectionsMax();
 
-            // Add to the animated elements
-            elementsAnimated.push(element);
-          },
-          callbackSections: false,
-          callbackWords: performanceMode == 'standard',
-          callbackVisuals: true,
-          callbackLetters: performanceMode == 'advanced',
-          onlyViewport: true
-        });
-      },
+				// Clear transform properties for the previously animated elements
+				for( let element of elementsAnimated ){
+					// Remove the transform style
+					element.style.transform = '';
 
-      animateAfter: function(){
-        // Reset the maximum value
-        root.setCollectionsMax();
+					// Reset the collection
+					elementsAnimated = [];
+				}
+			},
 
-        // Clear transform properties for the previously animated elements
-        for( let element of elementsAnimated ){
-          // Remove the transform style
-          element.style.transform = '';
+			checkPerformance: function(){
+				// Return frames per second
+				const getFPS = () =>
+				  new Promise(resolve =>
+				    requestAnimationFrame(t1 =>
+				      requestAnimationFrame(t2 => resolve(1000 / (t2 - t1)))
+				    )
+				  )
 
-          // Reset the collection
-          elementsAnimated = [];
-        }
-      },
+				// Check fps and switch to low performance mode
+				getFPS().then(function(fps){
+					if( fps < 20 ){
+						// Reset styles
+						root.eachCollectionElement({
+							callback: function(element){
+								element.style.transform = '';
+							},
+							callbackSections: false,
+							callbackWords: false,
+							callbackVisuals: false,
+							callbackLetters: true,
+							onlyViewport: false
+						});
 
-      checkPerformance: function(){
-        // Return frames per second
-        const getFPS = () =>
-          new Promise(resolve =>
-            requestAnimationFrame(t1 =>
-              requestAnimationFrame(t2 => resolve(1000 / (t2 - t1)))
-            )
-          )
+						// Avoid using letter selectors
+						performanceMode = 'standard';
+					}
+				});
+			},
 
-        // Check fps and switch to low performance mode
-        getFPS().then(function(fps){
-          if( fps < 20 ){
-            // Reset styles
-            root.eachCollectionElement({
-              callback: function(element){
-                element.style.transform = '';
-              },
-              callbackSections: false,
-              callbackWords: false,
-              callbackVisuals: false,
-              callbackLetters: true,
-              onlyViewport: false
-            });
+			isInViewport: function(element){
+				// Detection for advanced elements (fixed elements)
+				if( element['serialeffect-alwaysinviewport'] == true )
+					return true;
 
-            // Switch to words animation (instead of letters)
-            performanceMode = 'standard';
-          }
-        });
-      },
+				// Detection for standard elements (fixed elements won't be properly detected)
+				const elementTop = element['serialeffect-offetTop'];
+				const elementBottom = element['serialeffect-offsetBottom'];
+				const viewportTop = latestKnownScrollY;
+				const viewportBottom = latestKnownScrollY + windowHeight;
 
-      isInViewport: function(element){
-        // Detection for advanced elements (fixed elements)
-        if( element['serialeffect-alwaysinviewport'] == true )
-          return true;
+				return ( elementBottom > viewportTop && elementTop < viewportBottom );
+			},
 
-        // Detection for standard elements (fixed elements won't be properly detected)
-        const elementTop = element['serialeffect-offetTop'];
-        const elementBottom = element['serialeffect-offsetBottom'];
-        const viewportTop = latestKnownScrollY;
-        const viewportBottom = latestKnownScrollY + windowHeight;
+			setReady: function(){
+				// Used for CSS purpose
+				document.body.setAttribute('data-serialeffect-state', 'ready');
 
-        return ( elementBottom > viewportTop && elementTop < viewportBottom );
-      },
+				// Used for eachCollectionElement fn
+				initialized = true;
+			}
+		});
 
-      setReady: function(){
-        // Used for CSS purpose
-        document.body.setAttribute('data-serialeffect-state', 'ready');
+		// Initialisation
+		this.init();
+	};
 
-        // Used for eachCollectionElement fn
-        initialized = true;
-      }
-    });
-
-    // Initialisation
-    this.init();
-  };
-
-  $.serialeffect.defaults = {
-    sectionsSelector: 'section',
-    elementsSelector: 'div, p, li, h1, img, span, a, g',
-    elementsClass: 'js-serialeffect',
-    ignoreClass: 'js-serialeffect-ignore',
-    maxGap: 200,
-    callback: false
-  };
+	$.serialeffect.defaults = {
+		sectionsSelector: 'section',
+		elementsSelector: 'div, p, li, h1, img, span, a, g',
+		elementsClass: 'js-serialeffect',
+		ignoreClass: 'js-serialeffect-ignore',
+		maxGap: 200,
+		callback: false
+	};
 
 })(jQuery);
